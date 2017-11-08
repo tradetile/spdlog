@@ -24,19 +24,19 @@ matrix:
   include:
    
 # Test gcc-4.8: C++11, Build=Debug/Release, ASAN=Off
-    - env: GCC_VERSION=4.8 BUILD_TYPE=Debug CPP=11 ASAN=Off LIBCXX=Off
-      os: linux
-      addons: &gcc48
-        apt:
-          packages:
-            - g++-4.8
-            - valgrind
-          sources:
-            - ubuntu-toolchain-r-test
-
-    - env: GCC_VERSION=4.8 BUILD_TYPE=Release CPP=11 ASAN=Off LIBCXX=Off
-      os: linux
-      addons: *gcc48
+#    - env: GCC_VERSION=4.8 BUILD_TYPE=Debug CPP=11 ASAN=Off LIBCXX=Off
+#      os: linux
+#      addons: &gcc48
+#        apt:
+#          packages:
+#            - g++-4.8
+#            - valgrind
+#          sources:
+#            - ubuntu-toolchain-r-test
+#
+#    - env: GCC_VERSION=4.8 BUILD_TYPE=Release CPP=11 ASAN=Off LIBCXX=Off
+#      os: linux
+#      addons: *gcc48
       
     # Test gcc-4.9: C++11, Build=Debug/Release, ASAN=Off
     - env: GCC_VERSION=4.9 BUILD_TYPE=Debug CPP=11 ASAN=Off LIBCXX=Off
@@ -51,19 +51,17 @@ matrix:
 
     - env: GCC_VERSION=4.9 BUILD_TYPE=Release CPP=11 ASAN=Off LIBCXX=Off
       os: linux
-      addons: *gcc49
+      addons:
+        # travis test
+        coverity_scan:
+          project:
+            name: "tradetile/spdlog"
+            description: "Build submitted via Travis CI"
+          notification_email: dujung@kaist.ac.kr
+          build_command_prepend: "cd $CHECKOUT_PATH/tests"
+          build_command:   "make rebuild"
+          branch_pattern: coverity_scan
 
-# travis test.
-addons:
-  coverity_scan:
-    project:
-      name: "tradetile/spdlog"
-      description: "Build submitted via Travis CI"
-    notification_email: dujung@kaist.ac.kr
-    build_command_prepend: "./configure; make clean"
-    build_command:   "make -j 4"
-    branch_pattern: coverity_scan
-    
 # Install dependencies
 before_install:
   - export CHECKOUT_PATH=`pwd`;
