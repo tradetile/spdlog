@@ -4,6 +4,13 @@
 # - Eric Niebler's range-v3: https://github.com/ericniebler/range-v3
 language: cpp
 
+# travis test.
+env:
+  global:
+   # The next declaration is the encrypted COVERITY_SCAN_TOKEN, created
+   #   via the "travis encrypt" command using the project repo's public key
+   - secure: "kSgJWUVANCcfHHCd40asnT0NU00/I/4XrIBpXO7R5A8IP3h1tmmFcDFgb34nghVso3W1+iC3znFZNmhFpAn67EgdKVbeNfiSJ2sTiVRj600Kenh+XEUnjiFT0SOkj1hy9YR4qByd4eIHSDV1kYSZBlOZJ3+5SjBOF87Cl9n0knldt5PLSyU//hJ8P+lUsy/dkqaab1eWdB2/cZaOJjvsy0zl/753c0L76Axv93nZkifKJbsYAnu5NzYrgUQjU8HbGRIM+D/Vaod7hb4GdoW/JK9PNcxOe5TAudTDDT7QIV7hCKy+RdptRp6esNUGc5P3LDTptFjEXO2XiIeNUdvnGI2nvubKrquGPByTnRL1cUxQkCsa0yfLvC3mLyDsho9XUGsg5at8mQMVMC3uwMhIYKIBl+6fCr0MHtjEgr0EEbCjUvqtr3EC7UG4RIQW5bSTIDRMEtyzlKxmBe7+t+pUP37QDtXCJs1JyeVT0IwpzNxy9voXnvvU9KkthwK6UWX7EXqECbLRbOMFax25qKu599alux0OeS3Q64z0sC7gI9borgg9xTOjgHjPsbL8udpXDFlQalcUNxzorYZGR7fZ0lOxCWwzlvzSz9w3SzmsPzIS0L/cXHJDeXZmTEYRKM+tC+wYOBBBfCD05ugus6/YdAib9hfBy5AScmYYQmKwWQc="
+
 # Test matrix:
 # - Build matrix per compiler: C++11/C++14 + Debug/Release
 # - Optionally: AddressSanitizer (ASAN)
@@ -46,6 +53,17 @@ matrix:
       os: linux
       addons: *gcc49
 
+# travis test.
+addons:
+  coverity_scan:
+    project:
+      name: "tradetile/spdlog"
+      description: "Build submitted via Travis CI"
+    notification_email: dujung@kaist.ac.kr
+    build_command_prepend: "./configure; make clean"
+    build_command:   "make -j 4"
+    branch_pattern: coverity_scan
+    
 # Install dependencies
 before_install:
   - export CHECKOUT_PATH=`pwd`;
@@ -56,6 +74,7 @@ before_install:
   - which $CC
   - which valgrind
   - if [ -n "$CLANG_VERSION" ]; then sudo CXX=$CXX CC=$CC ./tests/install_libcxx.sh; fi
+  - echo -n | openssl s_client -connect scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-
 
 install:
   - cd $CHECKOUT_PATH
